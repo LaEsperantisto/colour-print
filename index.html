@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101522">
+<title>Colourprint — Personality Explorer</title>
+<style>
+:root{
+  --bg:#0d1220;--panel:#151d2e;--panel2:#1b263a;--text:#eef3fb;--muted:#a7b3c7;
+  --line:#2b3850;--blue:#69a9ff;--green:#62d3a0;--red:#ff7777;--yellow:#ffd16b;
+  --radius:20px;--shadow:0 18px 55px #0005;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% 0%,#1b2c49 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,textarea{font:inherit}
+button{cursor:pointer}
+.wrap{width:min(900px,calc(100% - 32px));margin:0 auto;padding:34px 0 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:42px}
+.brand{font-weight:800;letter-spacing:.12em;font-size:.88rem;text-transform:uppercase}
+.brand span{color:var(--blue)}
+.small-note{color:var(--muted);font-size:.82rem}
+.hero{text-align:center;margin:45px auto 36px;max-width:700px}
+.eyebrow{color:var(--blue);font-size:.76rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+h1{font-size:clamp(2.3rem,7vw,4.5rem);line-height:1.04;letter-spacing:-.055em;margin:12px 0 18px}
+h2{font-size:clamp(1.5rem,4vw,2.15rem);line-height:1.15;letter-spacing:-.035em;margin:8px 0 14px}
+p{color:var(--muted)}
+.hero p{font-size:1.08rem;max-width:600px;margin:0 auto 26px}
+.btn{border:0;border-radius:999px;padding:13px 23px;font-weight:750;background:var(--blue);color:#071321;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.card{background:linear-gradient(145deg,#182337,#121a2a);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(20px,4vw,34px);box-shadow:var(--shadow)}
+.pill{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;padding:5px 11px;color:var(--muted);font-size:.78rem}
+.hidden{display:none!important}
+.progress-head{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.85rem;margin-bottom:10px}
+.track{height:7px;background:#26334a;border-radius:99px;overflow:hidden;margin-bottom:28px}
+.track>div{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));width:0%;transition:width .25s}
+.question-kicker{color:var(--blue);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.13em}
+.question{font-size:clamp(1.45rem,4vw,2rem);font-weight:760;line-height:1.2;margin:10px 0}
+.prompt{margin:0 0 22px}
+.answers{display:grid;gap:10px}
+.answer{width:100%;text-align:left;border:1px solid var(--line);border-radius:14px;padding:15px 17px;background:#1a263a;color:var(--text);display:flex;gap:13px;align-items:flex-start;transition:border-color .15s,background .15s}
+.answer:hover{border-color:#759acb;background:#20304a}
+.answer.selected{border-color:var(--blue);background:#203653;box-shadow:inset 0 0 0 1px var(--blue)}
+.letter{flex:0 0 27px;height:27px;border-radius:9px;background:#2b3b55;color:#dbe9ff;display:grid;place-items:center;font-size:.8rem;font-weight:800}
+.answer-copy{display:block}
+.answer-copy strong{display:block;font-size:.97rem;margin-bottom:2px}
+.answer-copy small{display:block;color:var(--muted);font-size:.87rem;line-height:1.4}
+textarea{width:100%;resize:vertical;min-height:84px;border-radius:13px;border:1px solid var(--line);background:#0f1726;color:var(--text);padding:13px;outline:none}
+textarea:focus{border-color:var(--blue)}
+.explain{margin-top:20px}
+.explain label{display:block;font-size:.9rem;font-weight:700;margin-bottom:8px}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px}
+.actions-right{display:flex;gap:10px}
+.result-top{text-align:center;margin-bottom:28px}
+.result-top h2{font-size:2.2rem}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:22px 0}
+.colour-card{border:1px solid var(--line);border-radius:16px;padding:17px;background:#111a2a}
+.colour-head{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800}
+.swatch{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:7px}
+.bar{height:9px;background:#29364d;border-radius:99px;overflow:hidden;margin:12px 0 8px}
+.bar span{display:block;height:100%;border-radius:99px}
+.colour-card p{font-size:.88rem;margin:0}
+.insight{padding:18px;border-radius:15px;background:#101a2a;border:1px solid var(--line);margin-top:13px}
+.insight h3{margin:0 0 7px;font-size:1rem}
+.insight p{margin:0;font-size:.94rem}
+.meta{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:15px}
+.footer{margin-top:28px;text-align:center;color:var(--muted);font-size:.78rem}
+@media(max-width:620px){header{margin-bottom:24px}.hero{margin:28px auto}.result-grid{grid-template-columns:1fr}.actions{align-items:stretch}.actions .btn{padding:12px 16px}.actions-right{margin-left:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><div class="brand">COLOUR<span>PRINT</span></div><div class="small-note">A personality exploration</div></header>
+
+  <section id="intro">
+    <div class="hero">
+      <div class="eyebrow">Discover how you think and interact</div>
+      <h1>People are more than<br>four colours.</h1>
+      <p>Explore your mix of Red, Yellow, Green and Blue through thoughtful, adaptive questions — including the motivations behind your choices.</p>
+      <button class="btn" id="start">Begin the questionnaire <span aria-hidden="true">→</span></button>
+      <div class="meta"><span class="pill">One question at a time</span><span class="pill">Adaptive follow-ups</span><span class="pill">No account required</span></div>
+    </div>
+    <div class="card">
+      <h2>A note before you begin</h2>
+      <p>This is an informal reflection tool inspired by the four-colour personality framework. It is not a scientifically validated psychological test. There are no right answers; choose what you would genuinely do, rather than what sounds best.</p>
+      <p>Your answers are processed in this page and are not sent to a server. Free-text explanations are used to help you reflect, but are not automatically interpreted by an AI.</p>
+    </div>
+  </section>
+
+  <section id="quiz" class="hidden">
+    <div class="progress-head"><span id="step-label">Question 1</span><span id="progress-label">0% complete</span></div>
+    <div class="track"><div id="progress"></div></div>
+    <div class="card">
+      <div class="question-kicker" id="category">Decision-making</div>
+      <div class="question" id="question"></div>
+      <p class="prompt" id="prompt"></p>
+      <div class="answers" id="answers"></div>
+      <div class="explain">
+        <label for="reason">Would you like to explain your reasoning? <span class="small-note">(optional — often revealing)</span></label>
+        <textarea id="reason" placeholder="There isn't necessarily one correct answer…"></textarea>
+      </div>
+      <div class="actions">
+        <button class="btn secondary" id="back">← Back</button>
+        <div class="actions-right"><button class="btn" id="next" disabled>Next question →</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="results" class="hidden">
+    <div class="card">
+      <div class="result-top">
+        <div class="eyebrow">Your colour profile</div>
+        <h2 id="headline"></h2>
+        <p id="summary"></p>
+        <div class="meta" id="tags"></div>
+      </div>
+      <h3>Colour tendencies</h3>
+      <div class="result-grid" id="scores"></div>
+      <div class="insight"><h3>Your likely strengths</h3><p id="strengths"></p></div>
+      <div class="insight"><h3>Possible blind spots</h3><p id="blindspots"></p></div>
+      <div class="insight"><h3>How to read this result</h3><p id="caveat">These scores represent patterns in your answers, not fixed quantities of personality. The questionnaire is an informal framework, not a validated psychological instrument. A different context or day may produce different answers.</p></div>
+      <div class="actions">
+        <button class="btn secondary" id="review">Review answers</button>
+        <div class="actions-right"><button class="btn" id="restart">Start again ↻</button></div>
+      </div>
+    </div>
+  </section>
+  <div class="footer">COLOURPRINT · A reflective questionnaire, not a diagnosis.</div>
+</div>
+
+<script>
+const questions = [
+ {id:"lead",cat:"Taking initiative",q:"A group project has stalled because nobody knows what to do next. What are you most likely to do?",p:"Think about your first instinct, not what you think a leader ought to do.",a:[
+  ["Analyse the problem, then organise a practical way forward.","I want to understand the obstacle before acting.",{blue:2,red:1}],
+  ["Encourage everyone and get the group talking.","The group's energy and participation matter most.",{yellow:2,green:1}],
+  ["Make sure everyone is comfortable contributing.","I would rather build agreement than take over.",{green:2}],
+  ["Take charge and assign the next steps immediately.","A stalled project needs decisive action.",{red:2}],
+  ["Work out what is blocking progress, then help whoever needs it.","I would adapt to the actual cause.",{blue:1,green:1,red:1}]
+ ]},
+ {id:"truth",cat:"Disagreement",q:"Someone says something you believe is factually wrong. How do you respond?",p:"Assume the topic matters, but it isn't an emergency.",a:[
+  ["Correct them directly; accuracy matters more than awkwardness.", "I don't want misinformation to stand.",{blue:2,red:1}],
+  ["Explain the correction tactfully, without embarrassing them.","The truth matters, but so does dignity.",{blue:1,green:2}],
+  ["Ask questions to understand how they reached that conclusion.","Their reasoning may reveal something I missed.",{blue:2,green:1}],
+  ["Avoid challenging them unless it affects anyone.","Not every disagreement needs to become a debate.",{green:1,yellow:1}],
+  ["Turn it into an open discussion and involve others.","Different perspectives may help everyone.",{yellow:1,green:1,blue:1}]
+ ]},
+ {id:"curiosity",cat:"Motivation",q:"Which experience would leave you most satisfied?",p:"Choose the one that would feel most rewarding.",a:[
+  ["Understanding something difficult that once puzzled me.","The satisfaction comes from genuine comprehension.",{blue:3}],
+  ["Creating something original from ideas I've learnt.","I enjoy combining knowledge into something new.",{blue:2,red:1}],
+  ["Helping someone achieve something they thought impossible.","Their progress is deeply rewarding.",{green:3}],
+  ["Leading a group to accomplish an ambitious goal.","I enjoy momentum and tangible achievement.",{red:2,green:1}],
+  ["Making a group laugh and having a memorable time.","Shared enjoyment gives the experience value.",{yellow:3}]
+ ]},
+ {id:"friction",cat:"Working with others",q:"What tends to frustrate you most in a team?",p:"Choose the source of frustration that is most significant to you.",a:[
+  ["Indecision and avoidable inefficiency.","Time and momentum are being wasted.",{red:2}],
+  ["Careless reasoning or unsupported claims.","I want decisions to make intellectual sense.",{blue:3}],
+  ["People being ignored or made to feel unwelcome.","The human cost matters.",{green:3}],
+  ["A lack of enthusiasm or imagination.","The group feels lifeless.",{yellow:2}],
+  ["People obstructing others or preventing progress.","The effect on the whole group matters most.",{red:1,green:1,blue:1}]
+ ]},
+ {id:"learning",cat:"Learning and improvement",q:"When learning something new, what matters most?",p:"There may be more than one, but choose your strongest preference.",a:[
+  ["Understanding the underlying principles thoroughly.","I want to know why it works.",{blue:3}],
+  ["Being able to use it effectively as soon as possible.","Practical competence is the goal.",{red:2}],
+  ["Learning alongside someone and exchanging ideas.","I learn through shared exploration.",{green:1,yellow:1,blue:1}],
+  ["Discovering it independently, even if it takes longer.","The process of discovery matters.",{blue:2,red:1}],
+  ["Making the experience enjoyable and engaging.","Motivation and atmosphere matter.",{yellow:2,green:1}]
+ ]},
+ {id:"advice",cat:"Empathy and autonomy",q:"A friend is about to make a decision you think is unwise. What do you do?",p:"Assume the decision is theirs to make.",a:[
+  ["Give them my honest assessment and the reasons behind it.","They deserve the information, even if it is uncomfortable.",{blue:1,green:2}],
+  ["Offer advice, then respect their choice.","Their autonomy matters.",{green:3}],
+  ["Try to prevent the decision if the consequences are serious.","Sometimes intervention is necessary.",{red:2,green:1}],
+  ["Support them emotionally first; advice can come later.","Feeling understood may matter most initially.",{green:2,yellow:1}],
+  ["Ask questions so they can reach their own conclusion.","I want them to understand their own reasoning.",{blue:1,green:2}]
+ ]},
+ {id:"standards",cat:"Standards",q:"When do you consider a project finished?",p:"Think about a project you care about.",a:[
+  ["When it meets a clear, high standard of correctness.","Completeness and accuracy matter.",{blue:2}],
+  ["When it works reliably and does what it needs to do.","Useful and functional is enough.",{red:2}],
+  ["When the people using it are satisfied and supported.","Its effect on others is the measure.",{green:2}],
+  ["When further changes would add little value.","I know when to move on.",{red:1,blue:1}],
+  ["When it feels polished, expressive and engaging.","The overall experience matters.",{yellow:1,blue:1}]
+ ]},
+ {id:"social",cat:"Social energy",q:"At a gathering where you know some people, what do you naturally tend to do?",p:"Think about what you gravitate towards, rather than what you can do when needed.",a:[
+  ["Have a few meaningful conversations.","Depth matters more than breadth.",{blue:1,green:2}],
+  ["Move around, meet people and keep the energy up.","I enjoy social momentum.",{yellow:3}],
+  ["Make sure nobody is left out.","I notice who might feel uncomfortable.",{green:3}],
+  ["Organise an activity or take the lead.","I like giving the gathering direction.",{red:1,yellow:1}],
+  ["Observe and join in when something interests me.","I prefer to choose my moments.",{blue:1,green:1}]
+ ]},
+ {id:"rules",cat:"Independence",q:"You are told to follow a method you think is inefficient. What do you do?",p:"Assume there is no immediate safety risk.",a:[
+  ["Find out why the method exists, then propose a better one.","Rules should have good reasons.",{blue:2,red:1}],
+  ["Follow it; consistency and expectations matter.","There may be reasons I don't know.",{green:1}],
+  ["Use my own method if I know it works.","Results matter more than convention.",{red:2}],
+  ["Discuss it with the people involved and agree a change.","I want a solution people can support.",{green:2}],
+  ["Investigate it thoroughly before deciding.","I don't want to reject something prematurely.",{blue:3}]
+ ]},
+ {id:"recognition",cat:"Recognition",q:"You do something difficult and receive public praise. How do you feel?",p:"Imagine the praise is sincere.",a:[
+  ["Pleased; recognition motivates me to do more.","It is good to have my work noticed.",{red:2,yellow:1}],
+  ["A little uncomfortable; I redirect attention to contributors.","The achievement is shared.",{green:2}],
+  ["Mostly indifferent; the result matters more.","Praise isn't the point.",{blue:1,green:1}],
+  ["Very happy; I enjoy celebrating with people.","Shared excitement is rewarding.",{yellow:3}],
+  ["Glad, but I would rather discuss what was learnt.","The process interests me more.",{blue:2}]
+ ]},
+ {id:"debate",cat:"Truth-seeking",q:"A disagreement has become circular. Neither person is changing their mind. What do you do?",p:"What would you actually do after a frustrating debate?",a:[
+  ["Continue until I have made my case convincingly.","Important ideas deserve persistence.",{red:1,blue:1}],
+  ["Stop and investigate independently, including whether I am wrong.","Evidence matters more than winning.",{blue:3}],
+  ["Agree to disagree and move on.","The relationship or time may matter more.",{green:2}],
+  ["Try a different explanation or approach.","Perhaps we have not communicated properly.",{blue:1,green:1}],
+  ["Leave it unresolved, but remain dissatisfied.","I want the truth to be established.",{blue:2}]
+ ]},
+ {id:"ambition",cat:"Growth",q:"You are teaching someone who only wants the answer, not to understand the subject. What do you do?",p:"Assume they are content with memorising what they need.",a:[
+  ["Respect that and give them the answer they want.","Their goals are their own.",{green:2}],
+  ["Try to help them discover why understanding it is worthwhile.","I would like them to develop their own ambition.",{green:2,blue:1}],
+  ["Feel frustrated that they are wasting their potential.","They could achieve much more.",{red:1,blue:1}],
+  ["Make the subject more entertaining so they become interested.","Engagement might change their mind.",{yellow:1,green:1}],
+  ["Give them the answer; teaching beyond that is unnecessary.","I should focus on the requested task.",{red:1}]
+ ]},
+ {id:"discovery",cat:"Sharing knowledge",q:"You discover something genuinely important. What would you most likely do?",p:"Imagine it could be useful to other people.",a:[
+  ["Share it widely, then help others learn it.","Knowledge should benefit the world.",{green:2,yellow:1}],
+  ["Investigate it thoroughly before sharing.","I need to establish that it is sound.",{blue:3}],
+  ["Teach it to someone who could take it further.","I want others to build on it.",{green:3}],
+  ["Publish it with my name attached.","Attribution and credibility matter.",{red:2}],
+  ["Keep exploring privately; discovery is its own reward.","The investigation itself is satisfying.",{blue:2}]
+ ]},
+ {id:"lightdark",cat:"A closer distinction",q:"Which description sounds more like your relationship with knowledge?",p:"This question helps distinguish analytical depth from simply enjoying facts or ideas.",a:[
+  ["I enjoy rigorous analysis, evidence and precise explanations.","I want to understand mechanisms and test claims.",{darkBlue:3}],
+  ["I enjoy facts, clever ideas and interesting information, even without deep analysis.","Curiosity is broad and playful.",{lightBlue:3}],
+  ["Both: I enjoy interesting ideas and often investigate them deeply.","It depends on the subject.",{darkBlue:2,lightBlue:2}],
+  ["I mainly learn what is useful for a practical goal.","Knowledge is a tool for action.",{red:1,darkBlue:1}],
+  ["I learn best through people, discussion and shared experiences.","Understanding grows socially.",{green:1,lightYellow:1}]
+ ]},
+ {id:"yellowdepth",cat:"A closer distinction",q:"When you make people laugh or enjoy themselves, what best describes it?",p:"This helps distinguish social expressiveness from simply being considerate.",a:[
+  ["I naturally enjoy being expressive, entertaining and the centre of energy.","Social attention gives me energy.",{darkYellow:3}],
+  ["I like making people happy, but I don't need attention myself.","I enjoy their enjoyment more than performing.",{lightYellow:3,green:1}],
+  ["I am not particularly focused on entertaining people.","I prefer other kinds of connection.",{blue:1,green:1}],
+  ["I enjoy humour most in close friendships or meaningful conversations.","It depends on the people and context.",{lightYellow:2,green:1}]
+ ]},
+ {id:"greenred",cat:"A closer distinction",q:"When you take responsibility for a group, what is your main motivation?",p:"Choose the closest underlying reason.",a:[
+  ["To make sure everyone feels supported and included.","People should be able to contribute comfortably.",{green:3}],
+  ["To make sure the group achieves its objective.","Someone needs to make progress happen.",{red:3}],
+  ["To understand the situation and make the most rational decision.","The best answer should guide the group.",{blue:2,red:1}],
+  ["To help people become confident and capable without me.","I want them to grow independently.",{green:2,blue:1}],
+  ["I usually don't want responsibility unless it is necessary.","I prefer autonomy over authority.",{blue:1,green:1}]
+ ]}
+];
+
+const colours = {
+ red:{name:"Red",hex:"#ff7777",desc:"Action, decisiveness, results and taking initiative.",strength:"Can provide direction, make decisions and turn plans into action.",blind:"May move too quickly, overlook nuance or become impatient with slower processes."},
+ yellow:{name:"Yellow",hex:"#ffd16b",desc:"Sociability, enthusiasm, expression and shared excitement.",strength:"Can energise a group, communicate enthusiastically and make experiences enjoyable.",blind:"May become distracted by novelty, external stimulation or the desire for approval."},
+ green:{name:"Green",hex:"#62d3a0",desc:"Consideration, patience, cooperation and supporting others.",strength:"Can listen, mediate, build trust and help people feel able to develop.",blind:"May accommodate others too much or postpone difficult decisions."},
+ blue:{name:"Blue",hex:"#69a9ff",desc:"Analysis, precision, curiosity and understanding.",strength:"Can investigate carefully, notice inconsistencies and develop well-founded ideas.",blind:"May overanalyse, demand excessive certainty or find it difficult to stop refining."}
+};
+let order=[], index=0, answers={}, history=[], selected=null;
+const $=id=>document.getElementById(id);
+function start(){order=questions.map(q=>q.id);index=0;answers={};history=[];selected=null;$("intro").classList.add("hidden");$("results").classList.add("hidden");$("quiz").classList.remove("hidden");render()}
+function current(){return questions.find(q=>q.id===order[index])}
+function render(){
+ const q=current();if(!q){showResults();return}
+ selected=answers[q.id]?.choice??null;
+ $("step-label").textContent=`Question ${index+1} of ${order.length}`;
+ const pct=Math.round(index/order.length*100);$("progress-label").textContent=`${pct}% complete`;$("progress").style.width=pct+"%";
+ $("category").textContent=q.cat;$("question").textContent=q.q;$("prompt").textContent=q.p;
+ $("answers").innerHTML="";
+ q.a.forEach((a,i)=>{
+  const b=document.createElement("button");b.type="button";b.className="answer"+(selected===i?" selected":"");
+  b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span class="answer-copy"><strong></strong><small></small></span>`;
+  b.querySelector("strong").textContent=a[0];b.querySelector("small").textContent=a[1];
+  b.addEventListener("click",()=>choose(i));$("answers").appendChild(b);
+ });
+ $("reason").value=answers[q.id]?.reason||"";
+ $("back").disabled=index===0;$("next").disabled=selected===null;
+ $("next").textContent=index===order.length-1?"See my results →":"Next question →";
+}
+function choose(i){selected=i;const q=current();answers[q.id]={...(answers[q.id]||{}),choice:i};renderSelection();$("next").disabled=false}
+function renderSelection(){[...$("answers").children].forEach((el,i)=>el.classList.toggle("selected",i===selected))}
+function next(){
+ const q=current();if(selected===null)return;
+ answers[q.id]={...(answers[q.id]||{}),choice:selected,reason:$("reason").value.trim()};
+ if(index===order.length-1){showResults();return}
+ index++;render();
+}
+function back(){
+ if(index===0)return;
+ const q=current();if(q)answers[q.id]={...(answers[q.id]||{}),reason:$("reason").value.trim()};
+ index--;render();
+}
+function showResults(){
+ $("quiz").classList.add("hidden");$("results").classList.remove("hidden");
+ const raw={red:0,yellow:0,green:0,blue:0,darkBlue:0,lightBlue:0,darkYellow:0,lightYellow:0};
+ let answered=0;
+ order.forEach(id=>{const q=questions.find(x=>x.id===id),ans=answers[id];if(!ans||ans.choice==null)return;answered++;const score=q.a[ans.choice][2];Object.entries(score).forEach(([k,v])=>raw[k]=(raw[k]||0)+v)});
+ // Detail variants also inform their parent colour.
+ raw.blue += raw.darkBlue*.55 + raw.lightBlue*.45;
+ raw.yellow += raw.darkYellow*.55 + raw.lightYellow*.45;
+ const max=Math.max(raw.red,raw.yellow,raw.green,raw.blue,1);
+ const norm={red:raw.red/max*100,yellow:raw.yellow/max*100,green:raw.green/max*100,blue:raw.blue/max*100};
+ const ranked=Object.entries(norm).sort((a,b)=>b[1]-a[1]);
+ const first=ranked[0][0],second=ranked[1][0];
+ const variantBlue=raw.darkBlue>=raw.lightBlue?"Dark Blue":"Light Blue";
+ const variantYellow=raw.darkYellow>=raw.lightYellow?"Dark Yellow":"Light Yellow";
+ const primaryName=(first==="blue"?variantBlue:first==="yellow"?variantYellow:colours[first].name);
+ const secondaryName=(second==="blue"?variantBlue:second==="yellow"?variantYellow:colours[second].name);
+ $("headline").textContent=`${primaryName} – ${secondaryName}`;
+ const descriptions={
+ blue:"You tend to value understanding, evidence, careful thought and intellectual independence.",
+ green:"You tend to value cooperation, consideration, trust and helping people develop.",
+ red:"You tend to value action, direction, decisiveness and tangible progress.",
+ yellow:"You tend to value expression, enthusiasm, sociability and shared enjoyment."
+ };
+ $("summary").textContent=descriptions[first]+" "+descriptions[second];
+ $("tags").innerHTML=`<span class="pill">${answered} answers considered</span><span class="pill">Informal profile</span>`;
+ $("scores").innerHTML="";
+ ranked.forEach(([key,val])=>{
+  const c=colours[key],el=document.createElement("div");el.className="colour-card";
+  const detail=key==="blue"?(raw.darkBlue>=raw.lightBlue?"Dark Blue leaning":"Light Blue leaning"):key==="yellow"?(raw.darkYellow>=raw.lightYellow?"Dark Yellow leaning":"Light Yellow leaning"):"";
+  el.innerHTML=`<div class="colour-head"><span><i class="swatch" style="background:${c.hex}"></i>${c.name}</span><span>${Math.round(val)}%</span></div><div class="bar"><span style="width:${val}%;background:${c.hex}"></span></div><p>${c.desc}</p><p style="margin-top:7px;color:#e1e9f5">${detail}</p>`;
+  $("scores").appendChild(el);
+ });
+ const strengthList=ranked.slice(0,2).map(([k])=>colours[k].strength);
+ const blindList=ranked.slice(0,2).map(([k])=>colours[k].blind);
+ $("strengths").textContent=strengthList.join(" ");
+ $("blindspots").textContent=blindList.join(" ");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+$("start").addEventListener("click",start);$("next").addEventListener("click",next);$("back").addEventListener("click",back);
+$("reason").addEventListener("input",()=>{const q=current();if(q&&answers[q.id])answers[q.id].reason=$("reason").value});
+$("restart").addEventListener("click",start);
+$("review").addEventListener("click",()=>{$("results").classList.add("hidden");$("quiz").classList.remove("hidden");index=0;render();window.scrollTo({top:0,behavior:"smooth"})});
+</script>
+</body>
+</html>
